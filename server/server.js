@@ -13,14 +13,20 @@ const ChatMessage = require("./models/ChatMessage");
 const { subscriber } = require("../server/utils/pubsub");
 
 require('./events/bikeEvents');
-
 require("./workers/messageQueueWorker");
 
 const app = express();
 const server = http.createServer(app);
 
+app.use(cors()); 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
 
-app.use(cors());
+
+app.use((req, res, next) => {
+  if (!req.body) req.body = {};
+  next();
+});
 
 const { WebSocketServer } = require("ws");
 const wss = new WebSocketServer({ server });
@@ -106,7 +112,6 @@ const authRoutes = require("./routes/authRoutes");
 const bikeRoutes = require("./routes/bikeRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 
-app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 app.use("/api/auth", authRoutes);
