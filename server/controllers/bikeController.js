@@ -215,6 +215,20 @@ async function deleteBike(req, res, next) {
 // Rent bike
 async function rentBike(req, res, next) {
   try {
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!user.isVerified) {
+      return res.status(403).json({ 
+        error: 'Identity not verified. Please upload your license first.',
+        verificationStatus: user.verificationStatus
+      });
+    }
+
     const { bikeId } = req.body;
     if (!bikeId) return res.status(400).json({ error: 'bikeId required' });
 
