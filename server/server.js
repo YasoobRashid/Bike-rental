@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/bikerental";
 
 const ChatMessage = require("./models/ChatMessage");
-const { subscriber } = require("../server/utils/pubsub");
+const { subscriber } = require("./utils/pubsub");
 
 require('./events/bikeEvents');
 require("./workers/messageQueueWorker");
@@ -72,6 +72,8 @@ wss.on("connection", (socket) => {
           message: parsed.message,
           system: false
         });
+
+        await savedMessage.populate('sender', 'username');
 
         broadcastToRoom(parsed.bikeId, savedMessage);
       }
