@@ -1,6 +1,9 @@
 const Bike = require('../models/Bike');
 const redis = require('../utils/redis');
 const { publisher } = require("../utils/pubsub");
+const User = require('../models/User'); 
+const Tesseract = require('tesseract.js');
+const messageQueue = require('../utils/queue');
 
 const CACHE_AVAILABLE_BIKES = "available_bikes";
 
