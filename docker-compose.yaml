@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: bike_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  redis:
+    image: redis:alpine
+    container_name: bike_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  server:
+    build: ./server
+    container_name: bike_server
+    restart: always
+    ports:
+      - "4000:4000"  
+    
+    env_file:
+      - ./server/.env
+    
+    environment:
+      - PORT=4000
+      - MONGO_URI=mongodb://mongo:27017/bikerental
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+    depends_on:
+      - mongo
+      - redis
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  client:
+    build: ./client
+    container_name: bike_client
+    restart: always
+    ports:
+      - "5173:5173"
+    
+    env_file:
+      - ./server/.env
+
+    depends_on:
+      - server
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+
+volumes:
+  mongo-data:
