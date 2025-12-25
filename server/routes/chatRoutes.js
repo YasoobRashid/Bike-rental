@@ -14,4 +14,18 @@ router.get("/:bikeId", auth, async (req, res) => {
   }
 });
 
+router.get('/history/:bikeId', auth, async (req, res) => {
+  try {
+    const { bikeId } = req.params;
+    
+    const messages = await ChatMessage.find({ bikeId })
+      .populate('sender', 'username')
+      .sort({ createdAt: 1 });
+    
+    res.json(messages);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch chat history' });
+  }
+});
+
 module.exports = router;
